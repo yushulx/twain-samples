@@ -27,7 +27,7 @@ The project is ported from [twain-samples](https://github.com/twain/twain-sample
 
 ## How to Debug
 1. Run twacker.
-2. In Visual Studio, set a breakpoing in `DS_Entry()` and then go to `Debug > Attach to Process` to find the twacker process.
+2. In Visual Studio, set a breakpoint in `DS_Entry()` and then go to `Debug > Attach to Process` to find the twacker process.
     
     ![attach TWAIN DS to twacker](https://www.dynamsoft.com/blog/wp-content/uploads/2021/11/debug-twain-ds.jpg)
 
