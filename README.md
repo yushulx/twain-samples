@@ -36,4 +36,25 @@ The project is ported from [twain-samples](https://github.com/twain/twain-sample
     ![Debug TWAIN virtual scanner](https://www.dynamsoft.com/blog/wp-content/uploads/2021/11/visual-studio-debug-twain-ds.jpg)
 
 
+## How to Load Custom Image Set
+1. Create a `source.json` file which contains the folder of custom image set. For example:
+    
+    ```json
+    {
+        "folder": "C:/Users/admin/Pictures/barcode"
+    }
+    ```
+    
+    Copy the JSON file to `C:\Windows\twain_32\sample2`.
 
+2. In the folder of custom image set, create a `info.json` file which contains the index of current selected file:
+    
+    ```json
+    {
+        "index": 0
+    }
+    ```
+
+3. Use twacker to scan the custom images one by one. The index will be auto-updated if your folder have **Write permission**.
+
+    ![Windows virtual scanner with custom image set](https://www.dynamsoft.com/blog/wp-content/uploads/2021/11/windows-virtual-scanner-custom-images.jpg)
