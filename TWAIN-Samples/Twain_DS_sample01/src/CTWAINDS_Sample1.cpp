@@ -38,6 +38,14 @@
 
 #include "CTWAINDS_Sample1.h"
 #include <list>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+namespace fs = std::experimental::filesystem;
+using namespace std;
+
 //////////////////////////////////////////////////////////////////////////////
 // Globals
 /**

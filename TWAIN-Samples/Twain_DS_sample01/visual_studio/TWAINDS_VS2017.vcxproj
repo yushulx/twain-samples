@@ -415,6 +415,7 @@ copy "$(ProjectDir)\..\..\pub\bin\TWAIN_logo.png" c:\windows\twain_64\sample2
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\src\GeneratedFiles\$(Platform)\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="..\src\json.hpp" />
     <ClInclude Include="..\src\QT_UI.h" />
     <ClInclude Include="..\src\TWAINContainer.h" />
     <ClInclude Include="..\src\TWAINContainerBool.h" />

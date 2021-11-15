@@ -79,6 +79,12 @@ using namespace std;
 extern HINSTANCE   g_hinstance;
 #endif
 
+#include "json.hpp"
+using json = nlohmann::json;
+
+#include <filesystem>
+#include <fstream>
+namespace fs = std::experimental::filesystem;
 //////////////////////////////////////////////////////////////////////////////
 void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message)
 {
@@ -127,7 +133,67 @@ CScanner_FreeImage::CScanner_FreeImage() :
 	  }
 	  --x;
   }
-  SSNPRINTF(m_szSourceImagePath, sizeof(m_szSourceImagePath), PATH_MAX, "%s%cTWAIN_logo.png", szTWAIN_DS_DIR, PATH_SEPERATOR);
+
+  // Read custom image set
+  char sourceConfig[PATH_MAX];
+  SSNPRINTF(sourceConfig, sizeof(sourceConfig), PATH_MAX, "%s%csource.json", szTWAIN_DS_DIR, PATH_SEPERATOR);
+  vector<string> images;
+
+  if (FILE_EXISTS(sourceConfig))
+  {
+      // Read the image folder from source.json
+      ifstream stream(sourceConfig);
+      json  source;
+      stream >> source;
+      stream.close();
+
+      string imageFolder = source["folder"];
+
+      if (FILE_EXISTS(imageFolder.c_str()))
+      { 
+          // Get the image index
+          string infoPath = imageFolder + PATH_SEPERATOR + "info.json";
+          ifstream infoStream(infoPath);
+          json info;
+          infoStream >> info;
+          infoStream.close();
+
+          int index = info["index"];
+
+          for (const auto& entry : fs::directory_iterator(imageFolder))
+          {
+              std::string path{ entry.path().u8string() };
+              string suffix = path.substr(path.length() - 4, 4);
+              // Get JPEG or PNG files
+              if (!suffix.compare(".jpg") || !suffix.compare(".png"))
+              {
+                  images.push_back(path);
+              }
+          }
+
+          if (images.size() > 0)
+          {
+              if (index >= images.size()) index = 0;
+
+              // Set a custom image
+              SSNPRINTF(m_szSourceImagePath, sizeof(m_szSourceImagePath), PATH_MAX, images[index].c_str());
+
+              // Save image index to info.json
+              index += 1;
+              info["index"] = index;
+              std::ofstream stream(infoPath);
+              stream << info << std::endl;
+              stream.close();
+          }
+      }
+  }
+
+  // If there's no config file for custom image set, use the default image
+  if (images.size() == 0)
+  {
+      SSNPRINTF(m_szSourceImagePath, sizeof(m_szSourceImagePath), PATH_MAX, "%s%cTWAIN_logo.png", szTWAIN_DS_DIR, PATH_SEPERATOR);
+  }
+    
 #elif defined(TWNDS_OS_APPLE)	
   CFURLRef		fileURL = NULL;
   CFBundleRef		bundle;
