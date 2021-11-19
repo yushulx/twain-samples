@@ -58,3 +58,6 @@ The project is ported from [twain-samples](https://github.com/twain/twain-sample
 3. Use twacker to scan the custom images one by one. The index will be auto-updated if your folder have **Write permission**.
 
     ![Windows virtual scanner with custom image set](https://www.dynamsoft.com/blog/wp-content/uploads/2021/11/windows-virtual-scanner-custom-images.jpg)
+
+## Blog
+[How to Build Windows Virtual Scanner and Feed Custom Images](https://www.dynamsoft.com/codepool/windows-virtual-scanner-custom-images.html)
