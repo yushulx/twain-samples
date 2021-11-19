@@ -160,16 +160,37 @@ CScanner_FreeImage::CScanner_FreeImage() :
 
           int index = info["index"];
 
-          for (const auto& entry : fs::directory_iterator(imageFolder))
+          // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilea
+          WIN32_FIND_DATAA data;
+          HANDLE handle = FindFirstFileA((imageFolder + "\\*").c_str(), &data);
+
+          if (handle == INVALID_HANDLE_VALUE)
+              throw std::runtime_error("Invalid handle value! Please check your path...");
+
+          while (FindNextFileA(handle, &data) != 0)
           {
-              std::string path{ entry.path().u8string() };
+              string filename = std::string(data.cFileName);
+              string path = imageFolder + PATH_SEPERATOR + filename;
               string suffix = path.substr(path.length() - 4, 4);
-              // Get JPEG or PNG files
               if (!suffix.compare(".jpg") || !suffix.compare(".png"))
               {
                   images.push_back(path);
               }
           }
+
+          FindClose(handle);
+
+
+          //for (const auto& entry : fs::directory_iterator(imageFolder))
+          //{
+          //    std::string path{ entry.path().u8string() };
+          //    string suffix = path.substr(path.length() - 4, 4);
+          //    // Get JPEG or PNG files
+          //    if (!suffix.compare(".jpg") || !suffix.compare(".png"))
+          //    {
+          //        images.push_back(path);
+          //    }
+          //}
 
           if (images.size() > 0)
           {
