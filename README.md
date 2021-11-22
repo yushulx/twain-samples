@@ -47,11 +47,12 @@ The project is ported from [twain-samples](https://github.com/twain/twain-sample
     
     Copy the JSON file to `C:\Windows\twain_32\sample2`.
 
-2. In the folder of custom image set, create a `info.json` file which contains the index of current selected file:
+2. In the folder of custom image set, create a `info.json` file which contains the index of current selected file and max image count for ADF:
     
     ```json
     {
-        "index": 0
+        "index": 0,
+        "maxcount": 10
     }
     ```
 

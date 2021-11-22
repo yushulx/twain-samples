@@ -42,7 +42,8 @@
 #include "Common.h"
 #include "FreeImage.h"
 #include "twain.h"
-
+#include <vector>
+#include <string>
 /**
 * This is a virtual scanner.  The virtual scanner is used by the data source 
 * to try and somewhat simulate some real hardware interaction.
@@ -235,6 +236,8 @@ protected:
   WORD              m_nSourceWidth;           /**< Width of image in FreeImage */
   WORD              m_nSourceHeight;          /**< Height of image in FreeImage */
   char              m_szSourceImagePath[PATH_MAX];  /**< image used with FreeImage */
+
+  std::vector<std::string> images;
 };
 
 /**
