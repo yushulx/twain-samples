@@ -342,7 +342,7 @@ bool CScanner_FreeImage::acquireImage()
   }
 
   // get the image if it exists
-  if (images.size() > 0)
+  if (images.size() > 0 && m_nPaperSource == SFI_PAPERSOURCE_ADF)
   {
       // Set a custom image
       memset(m_szSourceImagePath, 0, PATH_MAX);
