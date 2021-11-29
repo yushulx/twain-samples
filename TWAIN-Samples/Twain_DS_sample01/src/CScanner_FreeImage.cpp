@@ -206,96 +206,103 @@ bool CScanner_FreeImage::resetScanner()
     m_pDIB = 0;
   }
 
-  // Read custom image set
-  char szTWAIN_DS_DIR[PATH_MAX];
-  GetModuleFileName(g_hinstance, szTWAIN_DS_DIR, PATH_MAX);
-  // strip filename from path
-  size_t x = strlen(szTWAIN_DS_DIR);
-  while (x > 0)
-  {
-      if (PATH_SEPERATOR == szTWAIN_DS_DIR[x - 1])
-      {
-          szTWAIN_DS_DIR[x - 1] = 0;
-          break;
-      }
-      --x;
-  }
-  char sourceConfig[PATH_MAX];
-  SSNPRINTF(sourceConfig, sizeof(sourceConfig), PATH_MAX, "%s%csource.json", szTWAIN_DS_DIR, PATH_SEPERATOR);
-
-  if (FILE_EXISTS(sourceConfig))
-  {
-      // Read the image folder from source.json
-      ifstream stream(sourceConfig);
-      json  source;
-      stream >> source;
-      stream.close();
-
-      string imageFolder = source["folder"];
-
-      if (FILE_EXISTS(imageFolder.c_str()))
-      {
-          // Get the image index and max image count for ADF
-          string infoPath = imageFolder + PATH_SEPERATOR + "info.json";
-          ifstream infoStream(infoPath);
-          json info;
-          infoStream >> info;
-          infoStream.close();
-
-          int index = info["index"];
-          m_nDocCount = m_nMaxDocCount = info["maxcount"];
-
-          // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilea
-          WIN32_FIND_DATAA data;
-          HANDLE handle = FindFirstFileA((imageFolder + "\\*").c_str(), &data);
-
-          if (handle == INVALID_HANDLE_VALUE)
-              throw std::runtime_error("Invalid handle value! Please check your path...");
-
-          while (FindNextFileA(handle, &data) != 0)
-          {
-              string filename = std::string(data.cFileName);
-              string path = imageFolder + PATH_SEPERATOR + filename;
-              string suffix = path.substr(path.length() - 4, 4);
-              if (!suffix.compare(".jpg") || !suffix.compare(".png"))
-              {
-                  images.push_back(path);
-              }
-          }
-
-          FindClose(handle);
-
-
-          //for (const auto& entry : fs::directory_iterator(imageFolder))
-          //{
-          //    std::string path{ entry.path().u8string() };
-          //    string suffix = path.substr(path.length() - 4, 4);
-          //    // Get JPEG or PNG files
-          //    if (!suffix.compare(".jpg") || !suffix.compare(".png"))
-          //    {
-          //        images.push_back(path);
-          //    }
-          //}
-
-          if (images.size() > 0)
-          {
-              if (index >= images.size()) index = 0;
-
-              // Set a custom image
-              memset(m_szSourceImagePath, 0, PATH_MAX);
-              SSNPRINTF(m_szSourceImagePath, sizeof(m_szSourceImagePath), PATH_MAX, images[index].c_str());
-
-              // Save image index to info.json
-              index += 1;
-              info["index"] = index;
-              std::ofstream stream(infoPath);
-              stream << info << std::endl;
-              stream.close();
-          }
-      }
-  }
-
   return bret;
+}
+
+void CScanner_FreeImage::initCustomDataSet()
+{
+    // Read custom image set
+    char szTWAIN_DS_DIR[PATH_MAX];
+    GetModuleFileName(g_hinstance, szTWAIN_DS_DIR, PATH_MAX);
+    // strip filename from path
+    size_t x = strlen(szTWAIN_DS_DIR);
+    while (x > 0)
+    {
+        if (PATH_SEPERATOR == szTWAIN_DS_DIR[x - 1])
+        {
+            szTWAIN_DS_DIR[x - 1] = 0;
+            break;
+        }
+        --x;
+    }
+    char sourceConfig[PATH_MAX];
+    SSNPRINTF(sourceConfig, sizeof(sourceConfig), PATH_MAX, "%s%csource.json", szTWAIN_DS_DIR, PATH_SEPERATOR);
+
+    if (FILE_EXISTS(sourceConfig))
+    {
+        // Read the image folder from source.json
+        ifstream stream(sourceConfig);
+        json  source;
+        stream >> source;
+        stream.close();
+
+        string imageFolder = source["folder"];
+
+        if (FILE_EXISTS(imageFolder.c_str()))
+        {
+            // Get the image index and max image count for ADF
+            string infoPath = imageFolder + PATH_SEPERATOR + "info.json";
+            ifstream infoStream(infoPath);
+            json info;
+            infoStream >> info;
+            infoStream.close();
+
+            int index = info["index"];
+            m_nDocCount = m_nMaxDocCount = info["maxcount"];
+
+            // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilea
+            WIN32_FIND_DATAA data;
+            HANDLE handle = FindFirstFileA((imageFolder + "\\*").c_str(), &data);
+
+            if (handle == INVALID_HANDLE_VALUE)
+                throw std::runtime_error("Invalid handle value! Please check your path...");
+
+            while (FindNextFileA(handle, &data) != 0)
+            {
+                string filename = std::string(data.cFileName);
+                string path = imageFolder + PATH_SEPERATOR + filename;
+                string suffix = path.substr(path.length() - 4, 4);
+                if (!suffix.compare(".jpg") || !suffix.compare(".png"))
+                {
+                    images.push_back(path);
+                }
+            }
+
+            FindClose(handle);
+
+
+            //for (const auto& entry : fs::directory_iterator(imageFolder))
+            //{
+            //    std::string path{ entry.path().u8string() };
+            //    string suffix = path.substr(path.length() - 4, 4);
+            //    // Get JPEG or PNG files
+            //    if (!suffix.compare(".jpg") || !suffix.compare(".png"))
+            //    {
+            //        images.push_back(path);
+            //    }
+            //}
+
+            if (images.size() > 0)
+            {
+                if (index >= images.size()) index = 0;
+                if (images.size() < m_nDocCount)
+                {
+                    m_nDocCount = m_nMaxDocCount = images.size();
+                }
+
+                // Set a custom image
+                memset(m_szSourceImagePath, 0, PATH_MAX);
+                SSNPRINTF(m_szSourceImagePath, sizeof(m_szSourceImagePath), PATH_MAX, images[index].c_str());
+
+                // Save image index to info.json
+                index += 1;
+                info["index"] = index;
+                std::ofstream stream(infoPath);
+                stream << info << std::endl;
+                stream.close();
+            }
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

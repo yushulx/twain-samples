@@ -149,6 +149,8 @@ public:
   */
   bool resetScanner();
 
+  void initCustomDataSet();
+
   /**
   * Get a scan line and put it into the _ImageXfer, fill values in _ImageXfer.
   * @param[out] pTransferBuffer a pointer to an array of bytes to store the image data

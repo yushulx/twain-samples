@@ -1013,6 +1013,8 @@ TW_INT16 CTWAINDS_FreeImage::openDS(pTW_IDENTITY  _pOrigin)
     m_CurrentState = dsState_Open;
   }
 
+  m_Scanner.initCustomDataSet();
+
   return ret;
 }
 
